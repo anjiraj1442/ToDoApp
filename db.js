@@ -12,6 +12,9 @@ const db_config = {
     port: '5432'
 }
 
+
+
+
 let pool = new Pool(db_config);
 
 async function DatabaseService() {
