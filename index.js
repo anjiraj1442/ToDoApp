@@ -6,12 +6,18 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require("bcrypt")
 const { query } = require('express');
 const auth = require('./middleware/auth')
+const authUser= require('./basicAuth')
+require("dotenv").config;
 
 
 
 //middileware 
 app.use(cors());
 app.use(express.json());
+
+app.get('/',(req, res, next)=>{
+  res.send("home page")
+})
 
 app.post('/register', async (req, res, next) => {
   const db = await DB();
@@ -38,7 +44,7 @@ app.post('/register', async (req, res, next) => {
   }
 })
 
-app.post('/login', async (req,res, next)=>{
+app.post('/login',  async (req,res, next)=>{
   const db = await DB();
   const {email, password}=req.body;
   try{
@@ -46,13 +52,25 @@ app.post('/login', async (req,res, next)=>{
     var result = await db.query(query)
     console.log("all details", result);
     if(result.rows[0]==0){
-      return res.status(401).json(result)
+      return res.status(401).json("email not registered")
     }else{
       const hashpass = result.rows[0].password;
+      console.log("hasspass",hashpass );
       const validPass = await bcrypt.compare(password, hashpass)
+      
      
       if(validPass){
+        const payload = {
+          email: result.rows[0].email,
+          password:result.rows[0].password
+        }
+          const token = jwt.sign(payload, process.env.SECRETTOKEN)
+         console.log("token",token);
+
         return res.status(401).json("login succs")
+         
+
+
       }else{
         return res.status(401).json("failed")
       }
@@ -69,7 +87,7 @@ app.post('/login', async (req,res, next)=>{
 
 
 
-app.post('/post', auth, async (req, res, next) => {
+app.post('/post',auth, async (req, res, next) => {
   console.log("calling api");
   const db = await DB();
   try {
