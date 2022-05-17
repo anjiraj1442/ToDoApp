@@ -6,7 +6,7 @@ const db_config = {
     idleTimeoutMillis : 10000,
     allowExitOnIdle:true,
     user: 'novigo',
-    host: '35.226.182.57',
+    host: '35.193.33.226',
     database: 'students',
     password: 'Novigo@123',
     port: '5432'

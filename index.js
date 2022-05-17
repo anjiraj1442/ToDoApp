@@ -125,10 +125,30 @@ app.get('/gettodos', async (req, res, next) => {
   }
 })
 
+app.get('/getById/:id', auth, async (req, res, next) => {
 
-app.delete('/delete/:id', async (req, res, next) => {
+  console.log("calling apui");
   const db = await DB();
   const { id } = req.params;
+  try {
+    result = {}
+    const query = `SELECT * FROM todo where id='${id}';`
+    var result = await db.query(query);
+    console.log("result", result);
+    result.message = "todo fetched succesfully"
+    res.status(200).json(result)
+  } catch (err) {
+    console.log("error", err);
+    next(err);
+  } finally {
+    db.close()
+  }
+})
+
+
+app.delete('/delete/:id',auth, async (req, res, next) => {
+  const db = await DB();
+   const { id } = req.params;
   try {
     var result = {};
     var query = `DELETE from todo where id='${id}'`;
@@ -143,7 +163,7 @@ app.delete('/delete/:id', async (req, res, next) => {
   }
 })
 
-app.put('/update/:id', async (req, res, next) => {
+app.put('/update/:id', auth, async (req, res, next) => {
   const db = await DB();
   const { id } = req.params;
   try {
